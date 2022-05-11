@@ -38,16 +38,40 @@ const Input = () => {
 
   return (
     <FormContainer>
-      <input
-        type="text"
-        placeholder="City Name"
-        maxLength={200}
-        {...register("city", { required: true })}
-      />
+      <CityInput>
+        <input
+          type="text"
+          placeholder="City Name"
+          maxLength={200}
+          autoComplete="off"
+          {...register("city", { required: true })}
+        />
+      </CityInput>
     </FormContainer>
   );
 };
 
 const FormContainer = styled.form``;
+const CityInput = styled.div`
+  input[type="text"] {
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px,
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(60 66 87 / 16%) 0px 0px 0px 1px,
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px,
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px;
+    padding: 1.25rem 1.25rem 1.25rem 3.75rem;
+    font-size: 1.25em;
+    border-radius: 0.25rem;
+
+    &:focus {
+      box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+        rgba(233, 133, 64, 0.25) 0px 0px 0px 4px,
+        rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(60, 66, 87, 0.16) 0px 0px 0px 1px,
+        rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+        rgba(0, 0, 0, 0) 0px 0px 0px 0px;
+    }
+  }
+`;
 
 export default Input;
