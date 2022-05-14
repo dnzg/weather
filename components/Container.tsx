@@ -9,6 +9,10 @@ const Container = ({ children }: LayoutProps) => {
   return <Wrapper>{children}</Wrapper>;
 };
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  max-width: 1280px;
+  width: 95%;
+  margin: 3rem auto;
+`;
 
 export default Container;
