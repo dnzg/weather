@@ -3,15 +3,10 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useDebounce from "utils/useDebounce";
+import { useCityContext } from "./CityContext";
 
 type FormValues = {
   cityName: string;
-};
-
-type SelectedSearchType = {
-  name: string;
-  lat: number;
-  lon: number;
 };
 
 const Input = () => {
@@ -24,12 +19,9 @@ const Input = () => {
   } = useForm<FormValues>();
   const watchCity = watch("cityName");
   const debouncedSearchTerm = useDebounce(watchCity, 1000);
-  const [sentCity, setSentCity] = useState("");
-  const [resultsArray, setResultsArray] = useState([]);
-  const [selectedSearch, setSearch] = useState<
-    SelectedSearchType | undefined
-  >();
   const [wasSearchSet, setSearchSet] = useState(false);
+  // const [resultsArray, setResultsArray] = useState([]);
+  const { setWeatherData } = useCityContext();
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     if (data.cityName.length > 0) {
@@ -38,44 +30,19 @@ const Input = () => {
   };
 
   useEffect(() => {
-    if (wasSearchSet && sentCity !== debouncedSearchTerm) {
-      setSearchSet(false);
-      console.log("test");
-    }
-  }, [debouncedSearchTerm, sentCity, wasSearchSet, watchCity]);
-
-  useEffect(() => {
-    if (
-      debouncedSearchTerm &&
-      !wasSearchSet &&
-      sentCity !== debouncedSearchTerm
-    ) {
+    if (debouncedSearchTerm && !wasSearchSet) {
       console.log(debouncedSearchTerm);
-      setSentCity(debouncedSearchTerm);
       axios
-        .post("/api/cities", { city: debouncedSearchTerm })
+        .post("/api/weather", { city: debouncedSearchTerm })
         .then((result) => {
-          console.log(result.data.cities);
-          setResultsArray(result.data.cities);
+          console.log(result.data.data);
+          setWeatherData(result.data.data);
         })
         .catch((err) => {
           console.error(err);
         });
     }
   }, [debouncedSearchTerm, wasSearchSet]);
-
-  useEffect(() => {
-    if (selectedSearch && selectedSearch.lat && selectedSearch.lon) {
-      console.log(selectedSearch);
-    }
-  }, [selectedSearch]);
-
-  const selectSearch = (name: string, lat: number, lon: number) => {
-    setValue("cityName", name);
-    setSearchSet(true);
-    setSearch({ name, lat, lon });
-    setResultsArray([]);
-  };
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
@@ -94,33 +61,6 @@ const Input = () => {
           </g>
         </svg>
       </CityInput>
-      {resultsArray.length > 0 && !wasSearchSet && (
-        <Results>
-          {resultsArray.map(
-            (
-              city: {
-                EnglishName: string;
-                Country: { EnglishName: string };
-              },
-              idx
-            ) => (
-              <div
-                className="result"
-                key={idx}
-                onClick={() =>
-                  selectSearch(
-                    `${city.EnglishName}, ${city.Country.EnglishName}`,
-                    0,
-                    0
-                  )
-                }
-              >
-                {city.EnglishName}, {city.Country.EnglishName}
-              </div>
-            )
-          )}
-        </Results>
-      )}
     </FormContainer>
   );
 };

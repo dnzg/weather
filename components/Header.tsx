@@ -1,14 +1,27 @@
 import styled from "styled-components";
 import type { ReactNode } from "react";
 import Input from "./Input";
+import { useCityContext } from "./CityContext";
 
 const Header = () => {
+  const { tempFormat, setTempFormat } = useCityContext();
+
   return (
     <div className="row">
       <Input />
       <Temps className="row">
-        <div>℉</div>
-        <div className="selected">℃</div>
+        <div
+          className={tempFormat === "F" ? "" : "selected"}
+          onClick={() => setTempFormat("F")}
+        >
+          ℉
+        </div>
+        <div
+          className={tempFormat === "C" ? "" : "selected"}
+          onClick={() => setTempFormat("C")}
+        >
+          ℃
+        </div>
       </Temps>
     </div>
   );

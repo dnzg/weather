@@ -1,7 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
+import { useEffect } from "react";
 import styled from "styled-components";
+import { useCityContext } from "./CityContext";
 
 const Day = () => {
+  const { weatherData } = useCityContext();
+  useEffect(() => {
+    console.log(weatherData);
+  }, [weatherData]);
+
   return (
     <Wrapper style={{ backgroundImage: "url(/cloudly.png)" }}>
       <div className="overlay"></div>
@@ -9,7 +16,7 @@ const Day = () => {
         <div className="header row">
           <div className="circle">
             <img
-              src="http://openweathermap.org/img/wn/10d@2x.png"
+              src={`http://openweathermap.org/img/wn/${weatherData.list[0].weather[0].icon}@2x.png`}
               alt="weather icon"
             />
           </div>
@@ -21,20 +28,20 @@ const Day = () => {
         </div>
         <div className="degree">
           <div className="row">
-            <span className="day">22℉</span>
+            <span className="day">{weatherData.list[0].main.temp}℉</span>
             <span className="night">11℉</span>
           </div>
-          <div>Partly cloudly</div>
+          <div>{weatherData.list[0].weather[0].description}</div>
           <div className="row">
             <div className="info">
               Pressure
               <br />
-              <span>800mb</span>
+              <span>{weatherData.list[0].main.pressure}mb</span>
             </div>
             <div className="info humidity">
               Humidity
               <br />
-              <span>87%</span>
+              <span>{weatherData.list[0].main.humidity}%</span>
             </div>
           </div>
         </div>
