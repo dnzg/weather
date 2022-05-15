@@ -1,10 +1,17 @@
 import styled from "styled-components";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import useDebounce from "utils/useDebounce";
 
 type FormValues = {
   cityName: string;
+};
+
+type SelectedSearchType = {
+  name: string;
+  lat: number;
+  lon: number;
 };
 
 const Input = () => {
@@ -12,8 +19,17 @@ const Input = () => {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>();
+  const watchCity = watch("cityName");
+  const debouncedSearchTerm = useDebounce(watchCity, 1000);
+  const [sentCity, setSentCity] = useState("");
+  const [resultsArray, setResultsArray] = useState([]);
+  const [selectedSearch, setSearch] = useState<
+    SelectedSearchType | undefined
+  >();
+  const [wasSearchSet, setSearchSet] = useState(false);
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     if (data.cityName.length > 0) {
@@ -21,24 +37,49 @@ const Input = () => {
     }
   };
 
-  const watchCity = watch("cityName");
+  useEffect(() => {
+    if (wasSearchSet && sentCity !== debouncedSearchTerm) {
+      setSearchSet(false);
+      console.log("test");
+    }
+  }, [debouncedSearchTerm, sentCity, wasSearchSet, watchCity]);
 
   useEffect(() => {
-    if (watchCity) {
+    if (
+      debouncedSearchTerm &&
+      !wasSearchSet &&
+      sentCity !== debouncedSearchTerm
+    ) {
+      console.log(debouncedSearchTerm);
+      setSentCity(debouncedSearchTerm);
       axios
-        .post("/api/weather", watchCity)
+        .post("/api/cities", { city: debouncedSearchTerm })
         .then((result) => {
-          console.log(result);
+          console.log(result.data.cities);
+          setResultsArray(result.data.cities);
         })
         .catch((err) => {
           console.error(err);
         });
     }
-  }, [watchCity]);
+  }, [debouncedSearchTerm, wasSearchSet]);
+
+  useEffect(() => {
+    if (selectedSearch && selectedSearch.lat && selectedSearch.lon) {
+      console.log(selectedSearch);
+    }
+  }, [selectedSearch]);
+
+  const selectSearch = (name: string, lat: number, lon: number) => {
+    setValue("cityName", name);
+    setSearchSet(true);
+    setSearch({ name, lat, lon });
+    setResultsArray([]);
+  };
 
   return (
-    <FormContainer>
-      <CityInput>
+    <FormContainer onSubmit={handleSubmit(onSubmit)}>
+      <CityInput wasSearchSet={wasSearchSet}>
         <input
           type="text"
           placeholder="City Name"
@@ -53,12 +94,45 @@ const Input = () => {
           </g>
         </svg>
       </CityInput>
+      {resultsArray.length > 0 && !wasSearchSet && (
+        <Results>
+          {resultsArray.map(
+            (
+              city: {
+                EnglishName: string;
+                Country: { EnglishName: string };
+              },
+              idx
+            ) => (
+              <div
+                className="result"
+                key={idx}
+                onClick={() =>
+                  selectSearch(
+                    `${city.EnglishName}, ${city.Country.EnglishName}`,
+                    0,
+                    0
+                  )
+                }
+              >
+                {city.EnglishName}, {city.Country.EnglishName}
+              </div>
+            )
+          )}
+        </Results>
+      )}
     </FormContainer>
   );
 };
 
-const FormContainer = styled.form``;
-const CityInput = styled.div`
+interface CityInputType {
+  wasSearchSet: boolean;
+}
+
+const FormContainer = styled.form`
+  position: relative;
+`;
+const CityInput = styled.div<CityInputType>`
   position: relative;
 
   input[type="text"]:focus + .icon g {
@@ -103,7 +177,39 @@ const CityInput = styled.div`
     margin: 1.175rem;
 
     g {
-      fill: rgba(0, 0, 0, 0.35);
+      fill: ${(props) =>
+        props.wasSearchSet ? "#f97f29" : "rgba(0, 0, 0, 0.35)"};
+    }
+  }
+`;
+const Results = styled.div`
+  position: absolute;
+  width: 100%;
+  margin: -0.1rem 0 0;
+  z-index: 4;
+
+  .result {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px,
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(60 66 87 / 16%) 0px 0px 0px 1px,
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px,
+      rgb(0 0 0 / 0%) 0px 0px 0px 0px;
+    width: 100%;
+    padding: 1rem;
+
+    &:first-child {
+      border-radius: 0.25rem 0.25rem 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 0 0.25rem 0.25rem;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 1);
+      color: #f97f29;
+      cursor: pointer;
     }
   }
 `;

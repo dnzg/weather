@@ -2,28 +2,36 @@
 import type { ReactNode } from "react";
 import styled from "styled-components";
 
-interface LayoutProps {
-  children: ReactNode;
-}
+type NextDayType = {
+  icon: string;
+  date: string;
+  weather: string;
+  tempDay: string;
+  tempNight: string;
+};
 
-const NextDay = () => {
-  return (
+const NextDay = ({ icon, date, weather, tempDay, tempNight }: NextDayType) => {
+  return icon && date && weather && tempDay && tempNight ? (
     <Wrapper>
       <div className="row align-items-center">
         <div className="circle">
           <img
-            src="http://openweathermap.org/img/wn/10d@2x.png"
+            src={`http://openweathermap.org/img/wn/${icon}@2x.png`}
             alt="weather icon"
           />
         </div>
         <div className="text">
-          <b>November 10</b>
+          <b>{date}</b>
           <br />
-          Cloudly
+          {weather}
         </div>
-        <div className="degrees">26° / 19°</div>
+        <div className="degrees">
+          {tempDay}° / {tempNight}°
+        </div>
       </div>
     </Wrapper>
+  ) : (
+    <></>
   );
 };
 
@@ -33,6 +41,7 @@ const Wrapper = styled.div`
     rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px,
     rgb(0 0 0 / 0%) 0px 0px 0px 0px;
   border-radius: 0.25rem;
+  margin-top: 1rem;
 
   .row {
     justify-content: flex-start;

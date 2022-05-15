@@ -39,6 +39,7 @@ const Wrapper = styled.div`
   height: fit-content;
   border-radius: 0.25rem;
   padding: 2rem 2rem 1.5rem;
+  margin-bottom: 3rem;
   background: #fff;
   box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px,
     rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(60 66 87 / 16%) 0px 0px 0px 1px,
