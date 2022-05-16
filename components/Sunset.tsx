@@ -35,8 +35,6 @@ const Sunset = ({ sunrise, sunset }: SunsetType) => {
       sunset: formatAMPM(sunset),
     });
 
-    console.log(sunrise, now, sunset);
-
     let nowFixed = now - sunrise;
     let sunsetFixed = sunset - sunrise;
     const gw = (nowFixed * 233) / sunsetFixed;

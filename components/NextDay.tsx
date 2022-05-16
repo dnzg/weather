@@ -29,7 +29,7 @@ const month = [
 const NextDay = ({ icon, date, weather, tempDay, tempNight }: NextDayType) => {
   const clarifyDate = (epoch: number) => {
     const date = new Date(epoch * 1000);
-    return month[date.getMonth()] + " " + date.getDay();
+    return month[date.getMonth()] + " " + date.getDate();
   };
 
   return icon && date && weather && tempDay && tempNight ? (

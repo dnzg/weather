@@ -44,7 +44,7 @@ const Home: NextPage = () => {
             <>
               <h2>Next 5 days</h2>
 
-              {weatherData.daily.slice(0, 5).map((day: any, idx: number) => (
+              {weatherData.daily.slice(1, 6).map((day: any, idx: number) => (
                 <NextDay
                   icon={day.weather[0].icon}
                   date={day.dt}
