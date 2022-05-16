@@ -4,7 +4,7 @@
     <img src="https://dnzg.ru/weather.jpg">
 </p>
 
-## [https://weather-two-sigma.vercel.app](DEMO)
+[https://weather-two-sigma.vercel.app](DEMO) — see the result.
 
 <strong>In this Next.JS project I've tried to show how to use OpenWeather API in small weather app.</strong>
 
