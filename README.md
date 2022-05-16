@@ -4,13 +4,9 @@
     <img src="https://dnzg.ru/weather.jpg">
 </p>
 
-<div align="center">  
-  <a href="https://weather-two-sigma.vercel.app/"><h3>DEMO</h3></a>
-</div>
+## [https://weather-two-sigma.vercel.app](DEMO)
 
-<p align="center">
-  <strong>In this Next.JS project I've tried to show how to use OpenWeather API in small weather app.</strong>
-</p>
+<strong>In this Next.JS project I've tried to show how to use OpenWeather API in small weather app.</strong>
 
 ## Getting Started
 
