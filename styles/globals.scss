@@ -21,8 +21,14 @@ a {
   display: flex;
   flex-direction: row;
   justify-content: center;
-
   width: 100%;
+}
+
+.rowMain {
+  @media screen and (max-width: 820px) {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .space-between {
@@ -33,13 +39,23 @@ a {
   align-items: center;
 }
 
-.left-col {
-  width: 65%;
-  max-width: 65%;
-  min-width: 65%;
+.col {
+  width: 33.3333%;
+  margin: 0 1rem;
+
+  @media screen and (max-width: 820px) {
+    width: 100%;
+  }
 }
 
-.right-col {
-  width: calc(35% - 1rem);
-  margin-left: 1rem;
+h2 {
+  margin: 1rem 0;
+}
+
+footer {
+  margin: 1rem 0;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.85em;
+  color: rgba(0, 0, 0, 0.25);
 }

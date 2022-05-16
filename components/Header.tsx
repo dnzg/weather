@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import type { ReactNode } from "react";
 import Input from "./Input";
 import { useCityContext } from "./CityContext";
 
@@ -8,7 +7,7 @@ const Header = () => {
 
   return (
     <div className="row">
-      <Input />
+      <Input defaultCity="Limassol" />
       <Temps className="row">
         <div
           className={tempFormat === "F" ? "" : "selected"}
@@ -31,7 +30,7 @@ export default Header;
 
 const Temps = styled.div`
   width: auto;
-  margin: 0 0 0 auto;
+  margin: 0 1rem 0 auto;
 
   div {
     background: #f97f29;

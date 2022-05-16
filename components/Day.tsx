@@ -1,22 +1,45 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect } from "react";
 import styled from "styled-components";
-import { useCityContext } from "./CityContext";
+import Temperature from "./Temperature";
+import getPicture from "utils/getPic";
+import { useEffect, useState } from "react";
 
-const Day = () => {
-  const { weatherData } = useCityContext();
+type DayType = {
+  icon: string;
+  currentTemp: number;
+  nightTemp: number;
+  description: string;
+  pressure: number;
+  humidity: number;
+  main: string;
+};
+
+const Day = ({
+  icon,
+  currentTemp,
+  nightTemp,
+  description,
+  pressure,
+  humidity,
+  main,
+}: DayType) => {
+  const [bg, setBg] = useState("");
+
   useEffect(() => {
-    console.log(weatherData);
-  }, [weatherData]);
+    async function get() {
+      setBg(await getPicture(main));
+    }
+    get();
+  }, [main]);
 
   return (
-    <Wrapper style={{ backgroundImage: "url(/cloudly.png)" }}>
+    <Wrapper style={{ backgroundImage: "url(" + bg + ")" }}>
       <div className="overlay"></div>
       <div className="content">
         <div className="header row">
           <div className="circle">
             <img
-              src={`http://openweathermap.org/img/wn/${weatherData.list[0].weather[0].icon}@2x.png`}
+              src={`http://openweathermap.org/img/wn/${icon}@2x.png`}
               alt="weather icon"
             />
           </div>
@@ -28,20 +51,20 @@ const Day = () => {
         </div>
         <div className="degree">
           <div className="row">
-            <span className="day">{weatherData.list[0].main.temp}℉</span>
-            <span className="night">11℉</span>
+            <span className="day">{Temperature(currentTemp)}</span>
+            <span className="night">Night: {Temperature(nightTemp)}</span>
           </div>
-          <div>{weatherData.list[0].weather[0].description}</div>
+          <div>{description}</div>
           <div className="row">
             <div className="info">
               Pressure
               <br />
-              <span>{weatherData.list[0].main.pressure}mb</span>
+              <span>{pressure}mb</span>
             </div>
             <div className="info humidity">
               Humidity
               <br />
-              <span>{weatherData.list[0].main.humidity}%</span>
+              <span>{humidity}%</span>
             </div>
           </div>
         </div>
@@ -61,6 +84,7 @@ const Wrapper = styled.div`
     rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(60 66 87 / 16%) 0px 0px 0px 1px,
     rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px,
     rgb(0 0 0 / 0%) 0px 0px 0px 0px;
+  color: #fff;
 
   .overlay {
     position: absolute;
@@ -70,7 +94,7 @@ const Wrapper = styled.div`
     right: 0;
     left: 0;
     margin: auto;
-    background-color: rgba(25, 40, 63, 0.15);
+    background-color: rgba(25, 40, 63, 0.75);
   }
 
   .content {
@@ -82,7 +106,7 @@ const Wrapper = styled.div`
     justify-content: flex-start;
 
     .circle {
-      background: rgba(25, 40, 63, 0.2);
+      background: rgba(255, 255, 255, 0.25);
       width: 2.75em;
       height: 2.75em;
       border-radius: 100%;
@@ -119,7 +143,7 @@ const Wrapper = styled.div`
     }
 
     .night {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.25);
       margin-left: 1em;
       padding: 0.45em 0.85em;
       border-radius: 0.45rem;

@@ -1,29 +1,75 @@
 import Container from "components/Container";
 import Day from "components/Day";
 import Header from "components/Header";
-import LineTemp from "components/LineTemp";
 import NextDay from "components/NextDay";
 import Sunset from "components/Sunset";
 import type { NextPage } from "next";
-import Image from "next/image";
+import { useCityContext } from "components/CityContext";
+import Preloader from "components/Preloader";
 
 const Home: NextPage = () => {
-  // tCels = (5/9)*(tFar-32)
+  const { weatherData } = useCityContext();
 
   return (
     <Container>
+      {Object.keys(weatherData).length === 0 && <Preloader />}
       <Header />
-      <div className="row" style={{ marginTop: "2rem" }}>
-        <div className="left-col">
-          <Day />
-          <LineTemp />
+      <div
+        className="row rowMain"
+        style={{
+          marginTop: "2rem",
+          marginLeft: "-1rem",
+          marginRight: "-1rem",
+        }}
+      >
+        <div className="col">
+          {weatherData.current && (
+            <>
+              <h2>Today</h2>
+
+              <Day
+                icon={weatherData.current.weather[0].icon}
+                currentTemp={weatherData.current.temp}
+                nightTemp={weatherData.daily[0].temp.night}
+                description={weatherData.current.weather[0].description}
+                pressure={weatherData.current.pressure}
+                humidity={weatherData.current.humidity}
+                main={weatherData.current.weather[0].main}
+              />
+            </>
+          )}
         </div>
-        <div className="right-col">
-          <Sunset />
-          <h2>Next 5 days</h2>
-          <NextDay icon="1" date="1" weather="1" tempDay="1" tempNight="1" />
+        <div className="col">
+          {weatherData.daily && (
+            <>
+              <h2>Next 5 days</h2>
+
+              {weatherData.daily.slice(0, 5).map((day: any, idx: number) => (
+                <NextDay
+                  icon={day.weather[0].icon}
+                  date={day.dt}
+                  weather={day.weather[0].description}
+                  tempDay={day.temp.day}
+                  tempNight={day.temp.night}
+                  key={idx}
+                />
+              ))}
+            </>
+          )}
+        </div>
+        <div className="col">
+          {weatherData.daily && weatherData.daily[0] && (
+            <>
+              <h2>Sun</h2>
+              <Sunset
+                sunrise={weatherData.daily[0].sunrise}
+                sunset={weatherData.daily[0].sunset}
+              />
+            </>
+          )}
         </div>
       </div>
+      <footer>made in 2099 by dnzg.dev</footer>
     </Container>
   );
 };

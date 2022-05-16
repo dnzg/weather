@@ -9,7 +9,7 @@ type FormValues = {
   cityName: string;
 };
 
-const Input = () => {
+const Input = ({ defaultCity }: { defaultCity: string }) => {
   const {
     register,
     handleSubmit,
@@ -19,34 +19,72 @@ const Input = () => {
   } = useForm<FormValues>();
   const watchCity = watch("cityName");
   const debouncedSearchTerm = useDebounce(watchCity, 1000);
-  const [wasSearchSet, setSearchSet] = useState(false);
-  // const [resultsArray, setResultsArray] = useState([]);
   const { setWeatherData } = useCityContext();
+
+  function getWeather(city: string) {
+    axios
+      .post("/api/weather", { city })
+      .then((result) => {
+        const data = result.data;
+        setWeatherData(data.data);
+        setValue("cityName", data.cityName);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  const getWeatherByLatLon = (lat: number, lon: number) => {
+    axios
+      .post("/api/weather", { lat, lon })
+      .then((result) => {
+        const data = result.data;
+        setWeatherData(data.data);
+        setValue("cityName", data.cityName);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     if (data.cityName.length > 0) {
-      //   complete(data);
+      getWeather(data.cityName);
     }
   };
 
   useEffect(() => {
-    if (debouncedSearchTerm && !wasSearchSet) {
-      console.log(debouncedSearchTerm);
-      axios
-        .post("/api/weather", { city: debouncedSearchTerm })
-        .then((result) => {
-          console.log(result.data.data);
-          setWeatherData(result.data.data);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+    if (debouncedSearchTerm) {
+      getWeather(debouncedSearchTerm);
     }
-  }, [debouncedSearchTerm, wasSearchSet]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchTerm]);
+
+  useEffect(() => {
+    const getWeatherLatLon = function (position: any) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+      getWeatherByLatLon(latitude, longitude);
+    };
+
+    if (defaultCity) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          getWeatherLatLon,
+          function (err) {
+            getWeather(defaultCity);
+          }
+        );
+      } else {
+        getWeather(defaultCity);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultCity]);
 
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
-      <CityInput wasSearchSet={wasSearchSet}>
+      <CityInput>
         <input
           type="text"
           placeholder="City Name"
@@ -65,14 +103,10 @@ const Input = () => {
   );
 };
 
-interface CityInputType {
-  wasSearchSet: boolean;
-}
-
 const FormContainer = styled.form`
   position: relative;
 `;
-const CityInput = styled.div<CityInputType>`
+const CityInput = styled.div`
   position: relative;
 
   input[type="text"]:focus + .icon g {
@@ -117,39 +151,7 @@ const CityInput = styled.div<CityInputType>`
     margin: 1.175rem;
 
     g {
-      fill: ${(props) =>
-        props.wasSearchSet ? "#f97f29" : "rgba(0, 0, 0, 0.35)"};
-    }
-  }
-`;
-const Results = styled.div`
-  position: absolute;
-  width: 100%;
-  margin: -0.1rem 0 0;
-  z-index: 4;
-
-  .result {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
-    box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px,
-      rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(60 66 87 / 16%) 0px 0px 0px 1px,
-      rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px,
-      rgb(0 0 0 / 0%) 0px 0px 0px 0px;
-    width: 100%;
-    padding: 1rem;
-
-    &:first-child {
-      border-radius: 0.25rem 0.25rem 0 0;
-    }
-
-    &:last-child {
-      border-radius: 0 0 0.25rem 0.25rem;
-    }
-
-    &:hover {
-      background: rgba(255, 255, 255, 1);
-      color: #f97f29;
-      cursor: pointer;
+      fill: rgba(0, 0, 0, 0.35);
     }
   }
 `;

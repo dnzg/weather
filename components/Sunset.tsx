@@ -2,33 +2,60 @@ import { ReactNode, useEffect, useState } from "react";
 import styled from "styled-components";
 import SunsetSVG from "./SunsetSVG";
 
-interface LayoutProps {
-  children: ReactNode;
-}
+type SunsetType = {
+  sunrise: number;
+  sunset: number;
+};
+const formatAMPM = (epoch: number) => {
+  const date = new Date(epoch * 1000);
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  const ampm = (hours >= 12 ? "pm" : "am").toUpperCase();
 
-const Sunset = () => {
+  hours %= 12;
+  hours = hours || 12;
+  let newMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+  const strTime = `${hours}:${newMinutes} ${ampm}`;
+
+  return strTime;
+};
+
+const Sunset = ({ sunrise, sunset }: SunsetType) => {
   const [sunsetSizes, setSunsetSizes] = useState({ cx: 32, gw: 0 });
+  const [time, setTime] = useState({ sunrise: "0", sunset: "0" });
+  const now = parseInt((new Date().getTime() / 1000).toFixed(0));
 
   useEffect(() => {
     // cx=265
-    // gw=233
-    const gw = 180;
+    // gw=0;233
+
+    setTime({
+      sunrise: formatAMPM(sunrise),
+      sunset: formatAMPM(sunset),
+    });
+
+    console.log(sunrise, now, sunset);
+
+    let nowFixed = now - sunrise;
+    let sunsetFixed = sunset - sunrise;
+    const gw = (nowFixed * 233) / sunsetFixed;
     setSunsetSizes({ cx: gw + 32, gw });
-  }, []);
+  }, [sunrise, sunset, now]);
 
   return (
     <Wrapper>
       <SunsetSVG cx={sunsetSizes.cx} gw={sunsetSizes.gw} />
       <div className="row space-between">
         <div className="time">
-          <b>Sunset</b>
-          <br />
-          06:00 AM
-        </div>
-        <div className="time">
           <b>Sunrise</b>
           <br />
-          06:45 AM
+          {time.sunrise}
+        </div>
+        <div className="time">
+          <b>Sunset</b>
+          <br />
+          {time.sunset}
         </div>
       </div>
     </Wrapper>

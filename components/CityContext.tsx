@@ -3,21 +3,32 @@ import {
   Dispatch,
   SetStateAction,
   useContext,
-  useEffect,
   useState,
 } from "react";
 
+interface WeatherDataType {
+  current: {
+    weather: { icon: string; description: string; main: string }[];
+    temp: number;
+    pressure: number;
+    humidity: number;
+  };
+  daily: { temp: { night: number }; sunrise: number; sunset: number }[];
+}
+
 interface CityContextType {
-  weatherData: object;
+  weatherData: WeatherDataType;
   tempFormat: string;
-  setWeatherData: Dispatch<SetStateAction<object>>;
+  setWeatherData: Dispatch<SetStateAction<WeatherDataType>>;
   setTempFormat: Dispatch<SetStateAction<string>>;
 }
 
 const CityContext = createContext<CityContextType>({} as CityContextType);
 
 export function CityWrapper({ children }: { children: any }) {
-  const [weatherData, setWeatherData] = useState<object>({});
+  const [weatherData, setWeatherData] = useState<WeatherDataType>(
+    {} as WeatherDataType
+  );
   const [tempFormat, setTempFormat] = useState<string>("F");
 
   return (

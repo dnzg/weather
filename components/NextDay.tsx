@@ -1,16 +1,37 @@
 /* eslint-disable @next/next/no-img-element */
 import type { ReactNode } from "react";
 import styled from "styled-components";
+import Temperature from "./Temperature";
 
 type NextDayType = {
   icon: string;
-  date: string;
+  date: number;
   weather: string;
-  tempDay: string;
-  tempNight: string;
+  tempDay: number;
+  tempNight: number;
 };
 
+const month = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 const NextDay = ({ icon, date, weather, tempDay, tempNight }: NextDayType) => {
+  const clarifyDate = (epoch: number) => {
+    const date = new Date(epoch * 1000);
+    return month[date.getMonth()] + " " + date.getDay();
+  };
+
   return icon && date && weather && tempDay && tempNight ? (
     <Wrapper>
       <div className="row align-items-center">
@@ -21,12 +42,12 @@ const NextDay = ({ icon, date, weather, tempDay, tempNight }: NextDayType) => {
           />
         </div>
         <div className="text">
-          <b>{date}</b>
+          {clarifyDate(date)}
           <br />
-          {weather}
+          <b>{weather}</b>
         </div>
         <div className="degrees">
-          {tempDay}° / {tempNight}°
+          {Temperature(tempDay)} / {Temperature(tempNight)}
         </div>
       </div>
     </Wrapper>
@@ -58,6 +79,15 @@ const Wrapper = styled.div`
       height: 100%;
       object-fit: contain;
       object-position: center;
+    }
+  }
+
+  .text {
+    color: rgba(0, 0, 0, 0.5);
+    line-height: 1.5;
+
+    b {
+      color: rgba(0, 0, 0, 1);
     }
   }
 
