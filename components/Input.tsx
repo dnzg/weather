@@ -19,43 +19,51 @@ const Input = ({ defaultCity }: { defaultCity: string }) => {
   } = useForm<FormValues>();
   const watchCity = watch("cityName");
   const debouncedSearchTerm = useDebounce(watchCity, 1000);
+  const [errorMsg, setErrorMsg] = useState("");
   const { setWeatherData } = useCityContext();
+  const [searchState, setSearchState] = useState("");
 
-  function getWeather(city: string) {
+  function getWeather({
+    city,
+    lat,
+    lon,
+  }: {
+    city?: string;
+    lat?: number;
+    lon?: number;
+  }) {
+    const reqData = city ? { city } : lat && lon ? { lat, lon } : null;
+    if (!reqData || (reqData.city && reqData.city === searchState))
+      return false;
     axios
-      .post("/api/weather", { city })
+      .post("/api/weather", reqData)
       .then((result) => {
         const data = result.data;
         setWeatherData(data.data);
         setValue("cityName", data.cityName);
+        setSearchState(data.cityName);
       })
       .catch((err) => {
         console.error(err);
+        setErrorMsg("Something went wrong");
       });
   }
 
-  const getWeatherByLatLon = (lat: number, lon: number) => {
-    axios
-      .post("/api/weather", { lat, lon })
-      .then((result) => {
-        const data = result.data;
-        setWeatherData(data.data);
-        setValue("cityName", data.cityName);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
+  useEffect(() => {
+    setTimeout(() => {
+      setErrorMsg("");
+    }, 2000);
+  }, [errorMsg]);
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     if (data.cityName.length > 0) {
-      getWeather(data.cityName);
+      getWeather({ city: data.cityName });
     }
   };
 
   useEffect(() => {
     if (debouncedSearchTerm) {
-      getWeather(debouncedSearchTerm);
+      getWeather({ city: debouncedSearchTerm });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm]);
@@ -64,7 +72,7 @@ const Input = ({ defaultCity }: { defaultCity: string }) => {
     const getWeatherLatLon = function (position: any) {
       var latitude = position.coords.latitude;
       var longitude = position.coords.longitude;
-      getWeatherByLatLon(latitude, longitude);
+      getWeather({ lat: latitude, lon: longitude });
     };
 
     if (defaultCity) {
@@ -72,11 +80,11 @@ const Input = ({ defaultCity }: { defaultCity: string }) => {
         navigator.geolocation.getCurrentPosition(
           getWeatherLatLon,
           function (err) {
-            getWeather(defaultCity);
+            getWeather({ city: defaultCity });
           }
         );
       } else {
-        getWeather(defaultCity);
+        getWeather({ city: defaultCity });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -99,12 +107,22 @@ const Input = ({ defaultCity }: { defaultCity: string }) => {
           </g>
         </svg>
       </CityInput>
+      {errorMsg && <span className="error">{errorMsg}</span>}
     </FormContainer>
   );
 };
 
 const FormContainer = styled.form`
   position: relative;
+
+  .error {
+    display: block;
+    margin: 1rem 0;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.85em;
+    color: rgba(0, 0, 0, 0.25);
+  }
 `;
 const CityInput = styled.div`
   position: relative;
@@ -124,6 +142,12 @@ const CityInput = styled.div`
     font-size: 1em;
     border-radius: 0.25rem;
     cursor: text;
+    user-select: initial;
+
+    &::before,
+    ::after {
+      user-select: initial;
+    }
 
     &::placeholder {
       color: rgba(0, 0, 0, 0.35);

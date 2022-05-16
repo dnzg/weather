@@ -37,7 +37,8 @@ const Sunset = ({ sunrise, sunset }: SunsetType) => {
 
     let nowFixed = now - sunrise;
     let sunsetFixed = sunset - sunrise;
-    const gw = (nowFixed * 233) / sunsetFixed;
+    let gw = (nowFixed * 233) / sunsetFixed;
+    gw = gw > 0 ? gw : 0;
     setSunsetSizes({ cx: gw + 32, gw });
   }, [sunrise, sunset, now]);
 

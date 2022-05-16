@@ -19,12 +19,20 @@ export default async function handler(
           `https://api.openweathermap.org/geo/1.0/direct?q=${req.body.city}&limit=5&appid=${API_KEY}`
         )
         .then((coordinates) => {
-          getWeather(
-            res,
-            coordinates.data[0].lat,
-            coordinates.data[0].lon,
-            `${coordinates.data[0].name}, ${coordinates.data[0].country}`
-          );
+          if (coordinates.data[0]) {
+            getWeather(
+              res,
+              coordinates.data[0].lat,
+              coordinates.data[0].lon,
+              `${coordinates.data[0].name}, ${coordinates.data[0].country}`
+            );
+          } else {
+            res.status(404).send({});
+          }
+        })
+        .catch((error) => {
+          res.status(404).send({ error });
+          res.end();
         });
       return;
     } else if (req.body.lat && req.body.lon) {
@@ -33,16 +41,20 @@ export default async function handler(
           `https://api.openweathermap.org/geo/1.0/reverse?lat=${req.body.lat}&lon=${req.body.lon}&limit=5&appid=${API_KEY}`
         )
         .then((coordinates) => {
-          getWeather(
-            res,
-            coordinates.data[0].lat,
-            coordinates.data[0].lon,
-            `${coordinates.data[0].name}, ${coordinates.data[0].country}`
-          );
+          if (coordinates.data[0]) {
+            getWeather(
+              res,
+              coordinates.data[0].lat,
+              coordinates.data[0].lon,
+              `${coordinates.data[0].name}, ${coordinates.data[0].country}`
+            );
+          } else {
+            res.status(404).send({});
+          }
         });
       return;
     } else {
-      res.status(405).send({});
+      res.status(404).send({});
       return;
     }
   });
@@ -66,7 +78,7 @@ function getWeather(
       res.end();
     })
     .catch((err) => {
-      res.status(400).json(err);
+      res.status(404).send({ err });
       res.end();
     });
 }
