@@ -8,7 +8,7 @@
 
 ## Getting Started
 
-1. Make sure you've got installed Node v.16. Then run `npm install` && `npm run dev`.
+1. Make sure you've got installed Node v.16. Then run `npm install && npm run dev`.
 
 2. Don't forget to generate [OpenWeather API key](https://home.openweathermap.org/api_keys) and write it in `.env` as `API_KEY` (example in `.env.example`).
 
