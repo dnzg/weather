@@ -5,7 +5,7 @@
 </p>
 
 <div align="center">  
-  <a href="https://weather-two-sigma.vercel.app/" target="_blank"><h3>DEMO</h3></a>
+  <a href="https://weather-two-sigma.vercel.app/"><h3>DEMO</h3></a>
 </div>
 
 <p align="center">
