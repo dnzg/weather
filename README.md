@@ -4,7 +4,7 @@
 
 [DEMO](https://weather-two-sigma.vercel.app) — see the result.
 
-<strong>In this Next.JS project I've tried to show how to use OpenWeather API in small weather app.</strong>
+<strong>In this Next.JS project I've tried to show how to use OpenWeather API in small weather app. Also for background image I used Freepik API from their Figma plugin.</strong>
 
 ## Getting Started
 
